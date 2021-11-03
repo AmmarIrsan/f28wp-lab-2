@@ -1,8 +1,10 @@
 function start() {
+  restart();
   //create bear
   bear = new Bear();
   // Add an event listener to the keypress event.
   document.addEventListener("keydown", moveBear, false);
+  //Add event listner for changing speed
   document
     .getElementById("speedBear")
     .addEventListener("change", setSpeed, false);
@@ -12,7 +14,16 @@ function start() {
   makeBees();
   //update location of bees
   updateBees();
+  //take start time
+  document.addEventListener(
+    "keydown",
+    function () {
+      lastStingTime = new Date();
+    },
+    false
+  );
 }
+
 function Bear() {
   this.dBear = 100;
   this.htmlElement = document.getElementById("bear");
@@ -48,6 +59,7 @@ function Bear() {
     this.dBear = document.getElementById("speedBear").value;
   };
 }
+
 // Handle keyboad events
 // to move the bear
 function moveBear(e) {
@@ -113,6 +125,7 @@ class Bee {
     };
   }
 }
+
 function createBeeImg(wNum) {
   //get dimension and position of board div
   let boardDiv = document.getElementById("board");
@@ -138,10 +151,12 @@ function createBeeImg(wNum) {
   //return the img object
   return img;
 }
-//reruen a random int number from 0 to max
+
+//return a random int number from 0 to max
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
+
 function makeBees() {
   //get number of bees specified by the user
   let nbBees = document.getElementById("nbBees").value;
@@ -161,6 +176,7 @@ function makeBees() {
     i++;
   }
 }
+
 function moveBees() {
   //get speed input field value
   let speed = document.getElementById("speedBees").value;
@@ -172,27 +188,41 @@ function moveBees() {
     isHit(bees[i], bear); //we add this to count stings
   }
 }
-let updateTimer;
+
 function updateBees() {
+  if (hits.innerHTML >= 1000) {
+    alert("GAMEOVER!");
+    clearTimeout(updateTimer);
+    return;
+  }
   // update loop for game
   //move the bees randomly
   moveBees();
   //use a fixed update period
   let period = document.getElementById("periodTimer").value; //modify this to control refresh period
-  if (hits.innerHTML == 1000) {
-    clearTimeout(updateTimer);
-  }
   //update the timer for the next move
   updateTimer = setTimeout("updateBees()", period);
 }
+
 function isHit(defender, offender) {
   if (overlap(defender, offender)) {
     //check if the two image overlap
     let score = hits.innerHTML;
     score = Number(score) + 1; //increment the score
     hits.innerHTML = score; //display the new score
+    let newStingTime = new Date();
+    let thisDuration = newStingTime - lastStingTime;
+    lastStingTime = newStingTime;
+    let longestDuration = Number(duration.innerHTML);
+    if (longestDuration === 0) {
+      longestDuration = thisDuration;
+    } else {
+      if (longestDuration < thisDuration) longestDuration = thisDuration;
+    }
+    document.getElementById("duration").innerHTML = longestDuration;
   }
 }
+
 function overlap(element1, element2) {
   //consider the two rectangles wrapping the two elements
   //rectangle of the first element
@@ -214,4 +244,9 @@ function overlap(element1, element2) {
     return false;
   }
   return true;
+}
+
+function restart() {
+  document.getElementById("hits").innerHTML = 0;
+  document.getElementById("duration").innerHTML = 0;
 }

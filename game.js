@@ -1,5 +1,4 @@
 function start() {
-  restart();
   //create bear
   bear = new Bear();
   // Add an event listener to the keypress event.
@@ -244,9 +243,4 @@ function overlap(element1, element2) {
     return false;
   }
   return true;
-}
-
-function restart() {
-  document.getElementById("hits").innerHTML = 0;
-  document.getElementById("duration").innerHTML = 0;
 }
